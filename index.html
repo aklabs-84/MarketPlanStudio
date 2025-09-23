@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심플 마케팅 기획 도구 - 구글 스프레드시트 연동</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">🎯 심플 마케팅 기획 도구</h1>
+            <p class="text-gray-600 text-lg">상품 선택부터 홍보 콘텐츠까지, 한 번에 기획하고 구글 시트에 저장하세요!</p>
+            <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p class="text-sm text-blue-700">📊 모든 기획 데이터가 구글 스프레드시트에 자동 저장됩니다</p>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700">진행 상황</span>
+                <span class="text-sm font-medium text-gray-700"><span id="progress-text">0</span>/6 단계</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progress-bar" class="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Step 0: 기획자 정보 -->
+        <div id="step-0" class="step-content bg-white rounded-2xl shadow-lg p-8 mb-6">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-4">⚙️</div>
+                <h2 class="text-2xl font-bold text-gray-800">기획자 정보</h2>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">기획자 이름</label>
+                    <input type="text" id="planner-name" placeholder="홍길동" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <p class="text-sm text-gray-500 mt-1">기획서에 기록될 이름을 입력해주세요</p>
+                </div>
+                
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h4 class="font-semibold text-blue-800 mb-2">📊 자동 저장 기능</h4>
+                    <p class="text-sm text-blue-700">Apps Script가 연동되어 모든 기획 데이터가 구글 스프레드시트에 자동 저장됩니다</p>
+                </div>
+            </div>
+            
+            <button onclick="nextStep(1)" class="mt-6 w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+                다음 단계: 상품/서비스 선택 →
+            </button>
+        </div>
+
+        <!-- Step 1: 상품 선택 -->
+        <div id="step-1" class="step-content bg-white rounded-2xl shadow-lg p-8 mb-6 hidden">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-4">1</div>
+                <h2 class="text-2xl font-bold text-gray-800">내가 소개할 상품/서비스 📦</h2>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">상품 이름</label>
+                    <input type="text" id="product-name" placeholder="예: 친환경 텀블러" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">한 줄 설명 (10~15자)</label>
+                    <input type="text" id="product-description" placeholder="예: 오래가는 보냉 보틀" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <p class="text-sm text-gray-500 mt-1">짧고 임팩트 있게 작성해주세요!</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">상품 카테고리</label>
+                    <select id="product-category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">카테고리 선택</option>
+                        <option value="생활용품">생활용품</option>
+                        <option value="패션/뷰티">패션/뷰티</option>
+                        <option value="음식/음료">음식/음료</option>
+                        <option value="전자제품">전자제품</option>
+                        <option value="건강/운동">건강/운동</option>
+                        <option value="서비스">서비스</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="nextStep(2)" class="mt-6 w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+                다음 단계: MBTI 테스트 구상하기 →
+            </button>
+        </div>
+
+        <!-- Step 2: MBTI 테스트 -->
+        <div id="step-2" class="step-content bg-white rounded-2xl shadow-lg p-8 mb-6 hidden">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-4">2</div>
+                <h2 class="text-2xl font-bold text-gray-800">MBTI 테스트 아이디어 🧠</h2>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">MBTI 질문 예시</label>
+                    <textarea id="mbti-question" placeholder="예: 주말에 나는... A. 집콕 (I) / B. 친구 만나기 (E)" 
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent h-24"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">테스트 결과와 상품 연결 아이디어</label>
+                    <textarea id="mbti-connection" placeholder="예: ENFP → 활동적인 당신에게, 언제 어디서든 시원한 텀블러 필요!" 
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent h-24"></textarea>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-6">
+                <button onclick="prevStep(1)" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all duration-300">
+                    ← 이전 단계
+                </button>
+                <button onclick="nextStep(3)" class="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+                    다음: 포스터 구상하기 →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: 포스터 아이디어 -->
+        <div id="step-3" class="step-content bg-white rounded-2xl shadow-lg p-8 mb-6 hidden">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-4">3</div>
+                <h2 class="text-2xl font-bold text-gray-800">홍보 포스터 아이디어 🎨</h2>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">포스터 메인 문구</label>
+                    <input type="text" id="poster-main" placeholder="예: 오늘도 시원하게, 친환경 텀블러" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">포스터에 들어갈 이미지/컬러</label>
+                    <input type="text" id="poster-visual" placeholder="예: 파란색, 시원한 물방울, 손에 든 보틀" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">타겟 고객층</label>
+                    <input type="text" id="target-audience" placeholder="예: 20~30대 직장인, 운동을 좋아하는 사람들" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-6">
+                <button onclick="prevStep(2)" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all duration-300">
+                    ← 이전 단계
+                </button>
+                <button onclick="nextStep(4)" class="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+                    다음: 쇼츠 영상 기획 →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: 쇼츠 영상 -->
+        <div id="step-4" class="step-content bg-white rounded-2xl shadow-lg p-8 mb-6 hidden">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-4">4</div>
+                <h2 class="text-2xl font-bold text-gray-800">홍보 쇼츠 영상 아이디어 📹</h2>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">영상 콘셉트 한 줄</label>
+                    <input type="text" id="video-concept" placeholder="예: 더위에 지친 순간, 한 모금으로 살아나는 장면" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-medium text-gray-700">영상 장면 스케치</label>
+                        <button type="button" onclick="addScene()" class="flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors duration-200">
+                            <span class="text-lg">+</span>
+                            <span class="text-sm font-medium">장면 추가</span>
+                        </button>
+                    </div>
+                    <div id="scenes-container" class="space-y-3">
+                        <div class="scene-item flex items-center gap-3">
+                            <span class="scene-number w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                            <input type="text" class="scene-input flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="첫 번째 장면">
+                            <button type="button" onclick="removeScene(this)" class="remove-scene w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors duration-200 opacity-0 pointer-events-none">
+                                <span class="text-sm">×</span>
+                            </button>
+                        </div>
+                        <div class="scene-item flex items-center gap-3">
+                            <span class="scene-number w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                            <input type="text" class="scene-input flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="두 번째 장면">
+                            <button type="button" onclick="removeScene(this)" class="remove-scene w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors duration-200 opacity-0 pointer-events-none">
+                                <span class="text-sm">×</span>
+                            </button>
+                        </div>
+                        <div class="scene-item flex items-center gap-3">
+                            <span class="scene-number w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                            <input type="text" class="scene-input flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="세 번째 장면">
+                            <button type="button" onclick="removeScene(this)" class="remove-scene w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors duration-200 opacity-0 pointer-events-none">
+                                <span class="text-sm">×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">예상 영상 길이</label>
+                    <select id="video-duration" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="15초">15초</option>
+                        <option value="30초">30초</option>
+                        <option value="60초">60초</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-6">
+                <button onclick="prevStep(3)" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all duration-300">
+                    ← 이전 단계
+                </button>
+                <button onclick="nextStep(5)" class="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+                    다음: 랜딩 페이지 구성 →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 5: 랜딩 페이지 -->
+        <div id="step-5" class="step-content bg-white rounded-2xl shadow-lg p-8 mb-6 hidden">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-4">5</div>
+                <h2 class="text-2xl font-bold text-gray-800">랜딩 페이지 구성 🚀</h2>
+            </div>
+            
+            <div class="space-y-8">
+                <!-- MBTI 테스트 페이지 -->
+                <div class="bg-blue-50 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold text-blue-800 mb-4">🧠 MBTI 테스트 페이지</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">MBTI 페이지 제목</label>
+                            <input type="text" id="mbti-page-title" placeholder="예: 내 성격에 맞는 음료 찾기!" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">설명 카피</label>
+                            <input type="text" id="mbti-description" placeholder="예: 몇 가지 질문으로 나에게 딱 맞는 상품을 찾아보세요" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 포스터 보기 -->
+                <div class="bg-purple-50 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold text-purple-800 mb-4">🎨 포스터 보기</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">포스터 메인 카피</label>
+                            <input type="text" id="poster-main-copy" placeholder="예: 환경도 지키고 스타일도 지킨다" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">짧은 서브 카피</label>
+                            <input type="text" id="poster-sub-copy" placeholder="예: 친환경 텀블러 하나로 내 일상에 변화를!" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 영상 보기 -->
+                <div class="bg-green-50 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold text-green-800 mb-4">📹 영상 보기 (쇼츠 영상)</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">영상 제목/인트로 문구</label>
+                            <input type="text" id="video-intro" placeholder="예: 더위에 지친 순간, 한 모금의 기적" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">영상 엔딩 카피</label>
+                            <input type="text" id="video-ending" placeholder="예: 오늘부터 나만의 텀블러와 함께!" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-6">
+                <button onclick="prevStep(4)" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all duration-300">
+                    ← 이전 단계
+                </button>
+                <button onclick="generateSummary()" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+                    ✨ 기획서 완성하고 저장하기!
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div id="summary" class="step-content bg-white rounded-2xl shadow-lg p-8 mb-6 hidden">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-2xl mx-auto mb-4">✓</div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">기획서 완성! 🎉</h2>
+                <p class="text-gray-600">당신만의 마케팅 전략이 완성되고 구글 스프레드시트에 저장되었습니다.</p>
+                <div id="save-status" class="mt-4 p-3 rounded-lg hidden">
+                    <!-- 저장 상태 메시지가 여기에 표시됩니다 -->
+                </div>
+            </div>
+            
+            <div id="summary-content" class="space-y-6">
+                <!-- 동적으로 생성될 요약 내용 -->
+            </div>
+            
+            <div class="flex gap-4 mt-8">
+                <button onclick="restartPlanning()" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all duration-300">
+                    🔄 새로 시작하기
+                </button>
+                <button onclick="saveToSpreadsheet()" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+                    💾 스프레드시트에 다시 저장
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⭐ 구글 앱스 스크립트 웹앱 URL을 여기에 입력하세요
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxzDWBb20ajCY1J_11gQzwzkYjnNaNbrLzjj30It3ubUOxQaALZ9VpvbF8HOCRuH9yJrA/exec';
+        
+        let currentStep = 0; // 기획자 정보부터 시작
+        const totalSteps = 6; // 총 6단계
+
+        function updateProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const percentage = (currentStep / totalSteps) * 100;
+            
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = currentStep;
+        }
+
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step-content').forEach(step => {
+                step.classList.add('hidden');
+            });
+            
+            document.getElementById(`step-${stepNumber}`).classList.remove('hidden');
+            
+            currentStep = stepNumber;
+            updateProgress();
+            
+            window.scrollTo(0, 0);
+        }
+
+        function nextStep(stepNumber) {
+            showStep(stepNumber);
+        }
+
+        function prevStep(stepNumber) {
+            showStep(stepNumber);
+        }
+
+        async function saveToSpreadsheet() {
+            if (!GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                showSaveStatus('error', '⚠️ 개발자가 구글 앱스 스크립트 URL을 설정해야 합니다.');
+                return;
+            }
+
+            try {
+                showSaveStatus('loading', '스프레드시트에 저장 중...');
+
+                const currentDate = new Date();
+                const formattedDate = currentDate.toLocaleString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
+                const scenes = getScenes();
+                const scenesText = scenes.filter(scene => scene.trim()).join(' | ');
+
+                const data = {
+                    timestamp: formattedDate,
+                    plannerName: document.getElementById('planner-name').value,
+                    productName: document.getElementById('product-name').value,
+                    productDescription: document.getElementById('product-description').value,
+                    productCategory: document.getElementById('product-category').value,
+                    mbtiQuestion: document.getElementById('mbti-question').value,
+                    mbtiConnection: document.getElementById('mbti-connection').value,
+                    posterMain: document.getElementById('poster-main').value,
+                    posterVisual: document.getElementById('poster-visual').value,
+                    targetAudience: document.getElementById('target-audience').value,
+                    videoConcept: document.getElementById('video-concept').value,
+                    scenes: scenesText,
+                    videoDuration: document.getElementById('video-duration').value,
+                    mbtiPageTitle: document.getElementById('mbti-page-title').value,
+                    mbtiDescription: document.getElementById('mbti-description').value,
+                    posterMainCopy: document.getElementById('poster-main-copy').value,
+                    posterSubCopy: document.getElementById('poster-sub-copy').value,
+                    budgetTimeline: '' // 예산일정 필드는 빈 값으로
+                };
+
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                    mode: 'no-cors'
+                });
+
+                showSaveStatus('success', '✅ 마케팅 기획서가 구글 스프레드시트에 성공적으로 저장되었습니다!');
+                console.log('마케팅 기획서가 스프레드시트에 저장되었습니다.');
+
+            } catch (error) {
+                console.error('스프레드시트 저장 중 오류 발생:', error);
+                showSaveStatus('error', '저장 중 오류가 발생했습니다. 앱스 스크립트 설정을 확인해주세요.');
+            }
+        }
+
+        function showSaveStatus(type, message) {
+            const statusDiv = document.getElementById('save-status');
+            statusDiv.classList.remove('hidden', 'bg-green-50', 'text-green-700', 'border-green-200', 
+                                       'bg-red-50', 'text-red-700', 'border-red-200',
+                                       'bg-blue-50', 'text-blue-700', 'border-blue-200');
+            
+            if (type === 'success') {
+                statusDiv.classList.add('bg-green-50', 'text-green-700', 'border', 'border-green-200');
+            } else if (type === 'error') {
+                statusDiv.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-200');
+            } else if (type === 'loading') {
+                statusDiv.classList.add('bg-blue-50', 'text-blue-700', 'border', 'border-blue-200');
+            }
+            
+            statusDiv.textContent = message;
+        }
+
+        async function generateSummary() {
+            const data = {
+                plannerName: document.getElementById('planner-name').value,
+                productName: document.getElementById('product-name').value,
+                productDescription: document.getElementById('product-description').value,
+                productCategory: document.getElementById('product-category').value,
+                mbtiQuestion: document.getElementById('mbti-question').value,
+                mbtiConnection: document.getElementById('mbti-connection').value,
+                posterMain: document.getElementById('poster-main').value,
+                posterVisual: document.getElementById('poster-visual').value,
+                targetAudience: document.getElementById('target-audience').value,
+                videoConcept: document.getElementById('video-concept').value,
+                scenes: getScenes(),
+                videoDuration: document.getElementById('video-duration').value,
+                mbtiPageTitle: document.getElementById('mbti-page-title').value,
+                mbtiDescription: document.getElementById('mbti-description').value,
+                posterMainCopy: document.getElementById('poster-main-copy').value,
+                posterSubCopy: document.getElementById('poster-sub-copy').value,
+                videoIntro: document.getElementById('video-intro').value,
+                videoEnding: document.getElementById('video-ending').value
+            };
+
+            const summaryContent = document.getElementById('summary-content');
+            
+            const scenesHTML = data.scenes.length > 0 
+                ? data.scenes.map((scene, index) => 
+                    `<div class="bg-white p-3 rounded-lg border border-gray-200">
+                        <div class="text-xs font-bold text-green-600 mb-1">장면 ${index + 1}</div>
+                        <div class="text-xs text-gray-600">${scene || `${index + 1}번째 장면 내용 없음`}</div>
+                    </div>`
+                ).join('')
+                : '<div class="bg-white p-3 rounded-lg border border-gray-200 text-center text-gray-500">입력된 장면이 없습니다</div>';
+
+            summaryContent.innerHTML = `
+                <!-- 기획자 및 상품 정보 -->
+                <div class="bg-gradient-to-r from-primary to-secondary text-white p-6 rounded-xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">${data.productName || '상품명을 입력해주세요'}</h3>
+                            <p class="opacity-90 text-lg">${data.productDescription || '상품 설명을 입력해주세요'}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm opacity-80">기획자</div>
+                            <div class="font-semibold">${data.plannerName || '미입력'}</div>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                        <span class="text-sm font-medium">카테고리:</span>
+                        <span class="ml-2">${data.productCategory || '미선택'}</span>
+                        <span class="ml-4 text-sm font-medium">타겟:</span>
+                        <span class="ml-2">${data.targetAudience || '미입력'}</span>
+                    </div>
+                </div>
+                
+                <!-- MBTI & 포스터 -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                        <h4 class="font-bold text-blue-800 mb-4 text-lg flex items-center">
+                            <span class="mr-2">🧠</span> MBTI 테스트 기획
+                        </h4>
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-sm font-medium text-blue-700">페이지 제목:</span>
+                                <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.mbtiPageTitle || '제목을 입력해주세요'}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-blue-700">질문 예시:</span>
+                                <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.mbtiQuestion || '질문을 입력해주세요'}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-blue-700">상품 연결 아이디어:</span>
+                                <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.mbtiConnection || '연결 아이디어를 입력해주세요'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-6 rounded-xl border border-purple-200">
+                        <h4 class="font-bold text-purple-800 mb-4 text-lg flex items-center">
+                            <span class="mr-2">🎨</span> 포스터 기획
+                        </h4>
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-sm font-medium text-purple-700">메인 문구:</span>
+                                <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.posterMain || '포스터 문구를 입력해주세요'}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-purple-700">메인 카피:</span>
+                                <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.posterMainCopy || '메인 카피를 입력해주세요'}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-purple-700">비주얼 요소:</span>
+                                <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.posterVisual || '비주얼 요소를 입력해주세요'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 쇼츠 영상 기획 -->
+                <div class="bg-green-50 p-6 rounded-xl border border-green-200">
+                    <h4 class="font-bold text-green-800 mb-4 text-lg flex items-center">
+                        <span class="mr-2">📹</span> 쇼츠 영상 기획
+                    </h4>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <span class="text-sm font-medium text-green-700">영상 콘셉트:</span>
+                            <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.videoConcept || '영상 콘셉트를 입력해주세요'}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-green-700">예상 길이:</span>
+                            <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.videoDuration || '미선택'}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-sm font-medium text-green-700 mb-2 block">장면 구성 (${data.scenes.length}개):</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            ${scenesHTML}
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <span class="text-sm font-medium text-green-700">인트로 문구:</span>
+                            <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.videoIntro || '인트로 문구를 입력해주세요'}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-green-700">엔딩 카피:</span>
+                            <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${data.videoEnding || '엔딩 카피를 입력해주세요'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 완성도 체크 -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <h4 class="font-bold text-gray-800 mb-3 text-lg flex items-center">
+                        <span class="mr-2">📋</span> 기획서 완성도 체크
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="text-2xl mb-1">${data.productName && data.productDescription ? '✅' : '❌'}</div>
+                            <div class="text-xs text-gray-600">상품 정보</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="text-2xl mb-1">${data.mbtiQuestion && data.mbtiConnection ? '✅' : '❌'}</div>
+                            <div class="text-xs text-gray-600">MBTI 테스트</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="text-2xl mb-1">${data.posterMain && data.posterVisual ? '✅' : '❌'}</div>
+                            <div class="text-xs text-gray-600">포스터 기획</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="text-2xl mb-1">${data.videoConcept && data.scenes.length >= 3 ? '✅' : '❌'}</div>
+                            <div class="text-xs text-gray-600">영상 기획</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelectorAll('.step-content').forEach(step => {
+                step.classList.add('hidden');
+            });
+            
+            document.getElementById('summary').classList.remove('hidden');
+            
+            currentStep = 5;
+            updateProgress();
+            
+            window.scrollTo(0, 0);
+
+            // 자동으로 스프레드시트에 저장
+            await saveToSpreadsheet();
+        }
+
+        function getScenes() {
+            const sceneInputs = document.querySelectorAll('.scene-input');
+            return Array.from(sceneInputs).map(input => input.value);
+        }
+
+        function addScene() {
+            const container = document.getElementById('scenes-container');
+            const sceneCount = container.children.length + 1;
+            
+            const sceneDiv = document.createElement('div');
+            sceneDiv.className = 'scene-item flex items-center gap-3';
+            sceneDiv.innerHTML = `
+                <span class="scene-number w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">${sceneCount}</span>
+                <input type="text" class="scene-input flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="${sceneCount}번째 장면">
+                <button type="button" onclick="removeScene(this)" class="remove-scene w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors duration-200">
+                    <span class="text-sm">×</span>
+                </button>
+            `;
+            
+            container.appendChild(sceneDiv);
+            updateSceneNumbers();
+            updateRemoveButtons();
+        }
+
+        function removeScene(button) {
+            const sceneItem = button.closest('.scene-item');
+            sceneItem.remove();
+            updateSceneNumbers();
+            updateRemoveButtons();
+        }
+
+        function updateSceneNumbers() {
+            const sceneItems = document.querySelectorAll('.scene-item');
+            sceneItems.forEach((item, index) => {
+                const numberSpan = item.querySelector('.scene-number');
+                const input = item.querySelector('.scene-input');
+                const sceneNumber = index + 1;
+                
+                numberSpan.textContent = sceneNumber;
+                input.placeholder = `${sceneNumber}번째 장면`;
+            });
+        }
+
+        function updateRemoveButtons() {
+            const removeButtons = document.querySelectorAll('.remove-scene');
+            const sceneCount = removeButtons.length;
+            
+            removeButtons.forEach(button => {
+                if (sceneCount > 3) {
+                    button.classList.remove('opacity-0', 'pointer-events-none');
+                } else {
+                    button.classList.add('opacity-0', 'pointer-events-none');
+                }
+            });
+        }
+
+        function restartPlanning() {
+            document.querySelectorAll('input, textarea, select').forEach(field => {
+                field.value = '';
+            });
+            
+            showStep(0); // 기획자 정보 단계로 되돌아가기
+            
+            // 저장 상태 메시지 숨기기
+            const statusDiv = document.getElementById('save-status');
+            statusDiv.classList.add('hidden');
+        }
+
+        // Initialize
+        updateProgress();
+        updateRemoveButtons();
+    </script>
+</body>
+</html>
